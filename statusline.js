@@ -153,7 +153,6 @@ process.stdin.on('end', () => {
 
   const c = {
     reset: '\x1b[0m',
-    bold:  '\x1b[1m',
     red:   '\x1b[31m',
     green: '\x1b[32m',
     yellow:'\x1b[33m',
@@ -180,22 +179,22 @@ process.stdin.on('end', () => {
       bar += i < filled ? paint(cellColor(i, width), '▰') : paint(c.gray, '▱');
     }
     const labelColor = filled > 0 ? cellColor(filled - 1, width) : c.gray;
-    return bar + ' ' + paint(c.bold + labelColor, Math.round(Math.max(0, pct)) + '%');
+    return bar + ' ' + paint(labelColor, Math.round(Math.max(0, pct)) + '%');
   };
 
   const rateLimitColor = (n) => n > RATE_LIMIT_RED_ABOVE ? c.red
                                : n > RATE_LIMIT_YELLOW_ABOVE ? c.yellow
                                : c.green;
 
+  const rateLimitToken = (label, window) => {
+    if (!window || typeof window.used_percentage !== 'number') return label + '-';
+    const n = Math.max(0, Math.round(window.used_percentage));
+    return paint(rateLimitColor(n), label + n + '%');
+  };
+
   const rateLimitPart = (rateLimits) => {
-    if (!rateLimits) return null;
-    const tokens = [['h', rateLimits.five_hour], ['wk', rateLimits.seven_day]]
-      .filter(([, w]) => w && typeof w.used_percentage === 'number')
-      .map(([label, w]) => {
-        const n = Math.max(0, Math.round(w.used_percentage));
-        return paint(c.bold + rateLimitColor(n), label + n + '%');
-      });
-    return tokens.length ? tokens.join(' ') : null;
+    const limits = rateLimits || {};
+    return rateLimitToken('h', limits.five_hour) + ' ' + rateLimitToken('wk', limits.seven_day);
   };
 
   const limits = rateLimitPart(data.rate_limits);
@@ -208,15 +207,15 @@ process.stdin.on('end', () => {
   const badge = cavemanBadge();
 
   const parts = [];
-  if (projectName) parts.push(paint(c.bold, PROJECT_ICON + ' ' + projectName));
+  if (projectName) parts.push(PROJECT_ICON + ' ' + projectName);
   if (model) parts.push(paint(c.cyan, model));
   if (barPct != null) parts.push(makeBar(barPct));
-  if (limits) parts.push(limits);
+  parts.push(limits);
   if (reflect) parts.push(reflect);
   if (report) parts.push(report);
   // Badge last: the bar is the thing being watched continuously, so it keeps
   // its position whether or not caveman is active.
-  if (badge) parts.push(paint(c.bold + c.orange, badge));
+  if (badge) parts.push(paint(c.orange, badge));
 
   const sep = paint(c.gray, SEPARATOR);
   process.stdout.write(parts.join(sep));
