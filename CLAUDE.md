@@ -18,6 +18,16 @@ For one-off payloads:
 
 To see it live in Claude Code, point `~/.claude/settings.json` → `statusLine.command` at this script and start a new session.
 
+## Releasing
+
+The live status line runs from a separate clone of this repo, not from this working tree. "Release", "deploy", "ship", "publish" or "update the live status line" in this repo is an explicit request for all three steps:
+
+1. Commit the pending changes here (skip if the tree is clean).
+2. `git push` to `origin/master`.
+3. In the configured clone, `git pull --ff-only`. Find the clone from the directory of the script in `statusLine.command` in `~/.claude/settings.json` (currently `~/.claude/statusline/`).
+
+Run `node ./preview.js` before step 1. Stop and ask if the clone has local changes or is not on `master`, or if `--ff-only` refuses: never merge, reset or force there. Report the commit both sides end on. The clone serves the next refresh, so no restart is needed.
+
 ## Architecture notes
 
 - **Input contract**: stdin JSON shape that matters — `model.display_name`, `context_window.{total_input_tokens,current_usage}`, `rate_limits.{five_hour,seven_day}.used_percentage`, `transcript_path`, `cost.{total_lines_added,total_lines_removed}`, `workspace.{project_dir,current_dir}`, `cwd`. The script defensively handles any of these being absent.
