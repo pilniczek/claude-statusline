@@ -15,6 +15,12 @@ const RATE_LIMIT_YELLOW_ABOVE = 50;
 const RATE_LIMIT_RED_ABOVE = 90;
 const PROJECT_ICON = '📁';
 const SEPARATOR = ' │ ';
+const REFLECT_ICON = '🧠';
+const REFLECT_QUEUE_MAX_BYTES = 1_048_576;
+const REPORT_ICON = '📋';
+const REPORT_DONE_ICON = '✅';
+const REPORT_MISSING_ICON = '❌';
+const REPORT_MAX_BYTES = 262_144;
 
 // --- Caveman badge ---
 // The caveman plugin (github.com/juliusbrussee/caveman) keeps the active
@@ -56,6 +62,66 @@ const readCavemanLevel = () => {
 const cavemanBadge = () => {
   const level = readCavemanLevel();
   return level === null ? null : CAVEMAN_ICON + ' ' + level;
+};
+
+const readSafeFile = (filePath, maxBytes) => {
+  const st = fs.lstatSync(filePath);
+  if (st.isSymbolicLink() || !st.isFile() || st.size > maxBytes) return null;
+  return fs.readFileSync(filePath, 'utf8');
+};
+
+const readLearningsCount = (transcriptPath) => {
+  if (!transcriptPath) return null;
+  try {
+    const text = readSafeFile(path.join(path.dirname(transcriptPath), 'learnings-queue.json'), REFLECT_QUEUE_MAX_BYTES);
+    if (text === null) return null;
+    const queue = JSON.parse(text);
+    return Array.isArray(queue) ? queue.length : null;
+  } catch (e) {
+    return e.code === 'ENOENT' ? 0 : null;
+  }
+};
+
+const reflectBadge = (transcriptPath) => {
+  const count = readLearningsCount(transcriptPath);
+  return count === null ? null : REFLECT_ICON + ' ' + count;
+};
+
+const findRepoRoot = (startDir) => {
+  if (!startDir) return null;
+  let dir = path.resolve(startDir);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, '.git'))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+};
+
+const countFollowUps = (text) => {
+  let inSection = false;
+  let count = 0;
+  for (const line of text.split(/\r?\n/)) {
+    if (line.startsWith('## ')) inSection = line.trim() === '## Follow-ups';
+    else if (inSection && line.startsWith('- [')) count++;
+  }
+  return count;
+};
+
+const readFollowUpCount = (root) => {
+  try {
+    const text = readSafeFile(path.join(root, 'WORK-REPORT.md'), REPORT_MAX_BYTES);
+    return text === null ? null : countFollowUps(text);
+  } catch (e) {
+    return e.code === 'ENOENT' ? undefined : null;
+  }
+};
+
+const reportBadge = (root, linesChanged) => {
+  const count = root ? readFollowUpCount(root) : undefined;
+  if (count === null) return null;
+  if (count === undefined) return REPORT_ICON + (linesChanged > 0 ? REPORT_MISSING_ICON : ' -');
+  return count > 0 ? REPORT_ICON + ' ' + count : REPORT_ICON + REPORT_DONE_ICON;
 };
 
 const chunks = [];
@@ -132,6 +198,12 @@ process.stdin.on('end', () => {
   };
 
   const limits = rateLimitPart(data.rate_limits);
+  const reflect = reflectBadge(data.transcript_path);
+  const cost = data.cost || {};
+  const report = reportBadge(
+    findRepoRoot((data.workspace && data.workspace.current_dir) || data.cwd),
+    (cost.total_lines_added || 0) + (cost.total_lines_removed || 0),
+  );
   const badge = cavemanBadge();
 
   const parts = [];
@@ -139,6 +211,8 @@ process.stdin.on('end', () => {
   if (model) parts.push(paint(c.cyan, model));
   if (barPct != null) parts.push(makeBar(barPct));
   if (limits) parts.push(limits);
+  if (reflect) parts.push(reflect);
+  if (report) parts.push(report);
   // Badge last: the bar is the thing being watched continuously, so it keeps
   // its position whether or not caveman is active.
   if (badge) parts.push(paint(c.bold + c.orange, badge));

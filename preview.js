@@ -28,6 +28,23 @@ const fixtureFor = (level) => {
   return fixtureDirs.get(key);
 };
 
+const workspaceFor = (scn) => {
+  const dir = path.join(fixtureRoot, 'ws-' + scn.label.replace(/[^a-z0-9]+/gi, '-'));
+  fs.mkdirSync(path.join(dir, 'repo', '.git'), { recursive: true });
+  fs.mkdirSync(path.join(dir, 'session'));
+  if (scn.learnings != null) {
+    fs.writeFileSync(path.join(dir, 'session', 'learnings-queue.json'), JSON.stringify(Array(scn.learnings).fill({})));
+  }
+  if (scn.follow_ups != null) {
+    const items = scn.follow_ups ? Array.from({ length: scn.follow_ups }, (_, i) => '- [action] item ' + i) : ['- none'];
+    fs.writeFileSync(path.join(dir, 'repo', 'WORK-REPORT.md'), ['# Work report', '', '## Follow-ups', '', ...items, ''].join('\n'));
+  }
+  return {
+    transcript_path: path.join(dir, 'session', 'transcript.jsonl'),
+    workspace: { project_dir: 'C:/tmp/demo', current_dir: path.join(dir, 'repo') },
+  };
+};
+
 const scenarios = [
   { label: 'empty',         used_tokens: 0,       caveman: null },
   { label: 'green  (30k)',  used_tokens: 30_000,  caveman: null },
@@ -39,6 +56,12 @@ const scenarios = [
   { label: 'limits: yellow', used_tokens: 30_000,  caveman: null, rate_limits: { five_hour: { used_percentage: 60 }, seven_day: { used_percentage: 75 } } },
   { label: 'limits: red',    used_tokens: 30_000,  caveman: null, rate_limits: { five_hour: { used_percentage: 95 }, seven_day: { used_percentage: 100 } } },
   { label: 'limits: 5h only', used_tokens: 30_000, caveman: 'ultra', rate_limits: { five_hour: { used_percentage: 40 } } },
+  { label: 'reflect: 0',      used_tokens: 30_000, caveman: null, workspace: true, learnings: null },
+  { label: 'reflect: 3',      used_tokens: 30_000, caveman: null, workspace: true, learnings: 3 },
+  { label: 'report: 2',       used_tokens: 30_000, caveman: null, workspace: true, learnings: 0, follow_ups: 2 },
+  { label: 'report: done',    used_tokens: 30_000, caveman: null, workspace: true, learnings: 0, follow_ups: 0 },
+  { label: 'report: missing', used_tokens: 30_000, caveman: null, workspace: true, learnings: 0, lines_changed: 12 },
+  { label: 'report: n/a',     used_tokens: 30_000, caveman: 'ultra', workspace: true, learnings: 0 },
   { label: 'badge: none',   used_tokens: 30_000,  caveman: null },
   { label: 'badge: full',   used_tokens: 30_000,  caveman: 'full' },
   { label: 'badge: ultra',  used_tokens: 30_000,  caveman: 'ultra' },
@@ -54,6 +77,8 @@ const render = (scn) => new Promise((resolve, reject) => {
     context_window: { total_input_tokens: scn.used_tokens },
     workspace: { project_dir: 'C:/tmp/demo' },
     rate_limits: scn.rate_limits,
+    cost: { total_lines_added: scn.lines_changed || 0, total_lines_removed: 0 },
+    ...(scn.workspace ? workspaceFor(scn) : {}),
   });
   process.stdout.write(scn.label.padEnd(15) + '  ');
   const child = spawn(process.execPath, [SCRIPT], {

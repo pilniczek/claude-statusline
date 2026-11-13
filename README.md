@@ -1,9 +1,9 @@
 # claude-statusline
 
-A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", 5-hour and weekly plan usage, and an optional caveman-level badge.
+A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", 5-hour and weekly plan usage, claude-reflect and work report badges, and an optional caveman-level badge.
 
 ```
-📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ h50% wk70% │ 🦴 full
+📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ h50% wk70% │ 🧠 3 │ 📋 2 │ 🦴 full
 ```
 
 ## Install
@@ -27,6 +27,21 @@ Restart Claude Code (or start a new session).
 
 Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. Without them the readout is hidden; if only one window is reported, only that one shows. Reset times and the gateway `spend_limit` are not shown.
 
+## Reflect and work report badges
+
+`🧠 3` counts the learnings [claude-reflect](https://github.com/BayramAnnakov/claude-reflect) has queued for this project and waiting for `/reflect`. It shows `🧠 0` when the queue is empty and disappears only when Claude Code sends no transcript path.
+
+`📋` tracks `WORK-REPORT.md` from the work-report skill, at the root of the current git repo:
+
+```
+📋 2      report exists, 2 open follow-ups
+📋✅      report exists, no follow-ups
+📋❌      no report, and this session changed code
+📋 -      no report and nothing changed, or not in a git repo
+```
+
+Both files are only counted, never printed. A symlinked or oversized file hides its badge.
+
 ## Caveman badge
 
 If the [caveman](https://github.com/juliusbrussee/caveman) plugin is installed, its hooks record the active intensity level in `~/.claude/.caveman-active` (or `$CLAUDE_CONFIG_DIR/.caveman-active`). The status line reads that file and shows the level, which is otherwise invisible, at the end of the line:
@@ -44,7 +59,7 @@ Nothing to configure, and nothing to install: without the plugin the file never 
 
 ## Configure
 
-Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PROJECT_ICON`, `SEPARATOR`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
+Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PROJECT_ICON`, `SEPARATOR`, `REFLECT_ICON`, `REPORT_ICON`, `REPORT_DONE_ICON`, `REPORT_MISSING_ICON`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
 
 ## Preview locally
 
