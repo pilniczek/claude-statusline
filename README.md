@@ -1,9 +1,9 @@
 # claude-statusline
 
-A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 20-cell context-usage bar scaled to a 100k-token "smart zone", and an optional caveman-level badge.
+A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", and an optional caveman-level badge.
 
 ```
-📁 important │ Opus 4.7 (1M) │ 0% ▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱ 15% out of 100k │ 🦴 full
+📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ 🦴 full
 ```
 
 ## Install
@@ -51,5 +51,5 @@ node ./preview.js
 Or pipe a single ad-hoc payload:
 
 ```powershell
-'{"model":{"display_name":"Opus 4.7 (1M context)"},"context_window":{"used_percentage":60}}' | node ./statusline.js
+'{"model":{"display_name":"Opus 4.7 (1M context)"},"context_window":{"total_input_tokens":120000}}' | node ./statusline.js
 ```

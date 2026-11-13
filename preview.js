@@ -30,16 +30,16 @@ const fixtureFor = (level) => {
 
 const scenarios = [
   { label: 'empty',         used_tokens: 0,       caveman: null },
-  { label: 'green  (15k)',  used_tokens: 15_000,  caveman: null },
-  { label: 'yellow (60k)',  used_tokens: 60_000,  caveman: null },
-  { label: 'red    (95k)',  used_tokens: 95_000,  caveman: null },
-  { label: 'full  (100k)',  used_tokens: 100_000, caveman: null },
-  { label: 'over  (250k)',  used_tokens: 250_000, caveman: null },
-  { label: 'badge: none',   used_tokens: 15_000,  caveman: null },
-  { label: 'badge: full',   used_tokens: 15_000,  caveman: 'full' },
-  { label: 'badge: ultra',  used_tokens: 15_000,  caveman: 'ultra' },
-  { label: 'badge: wenyan', used_tokens: 15_000,  caveman: 'wenyan-ultra' },
-  { label: 'badge: off',    used_tokens: 15_000,  caveman: 'off' },
+  { label: 'green  (30k)',  used_tokens: 30_000,  caveman: null },
+  { label: 'yellow (120k)', used_tokens: 120_000, caveman: null },
+  { label: 'red    (170k)', used_tokens: 170_000, caveman: null },
+  { label: 'full   (200k)', used_tokens: 200_000, caveman: null },
+  { label: 'over   (500k)', used_tokens: 500_000, caveman: null },
+  { label: 'badge: none',   used_tokens: 30_000,  caveman: null },
+  { label: 'badge: full',   used_tokens: 30_000,  caveman: 'full' },
+  { label: 'badge: ultra',  used_tokens: 30_000,  caveman: 'ultra' },
+  { label: 'badge: wenyan', used_tokens: 30_000,  caveman: 'wenyan-ultra' },
+  { label: 'badge: off',    used_tokens: 30_000,  caveman: 'off' },
 ];
 
 // Inherit parent stdout so the child writes ANSI directly to the terminal
@@ -47,7 +47,7 @@ const scenarios = [
 const render = (scn) => new Promise((resolve, reject) => {
   const payload = JSON.stringify({
     model: { display_name: 'Opus 4.7 (1M context)' },
-    context_window: { used_tokens: scn.used_tokens },
+    context_window: { total_input_tokens: scn.used_tokens },
     workspace: { project_dir: 'C:/tmp/demo' },
   });
   process.stdout.write(scn.label.padEnd(14) + '  ');

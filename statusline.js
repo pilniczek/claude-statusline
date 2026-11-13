@@ -65,28 +65,16 @@ process.stdin.on('end', () => {
 
   // --- Context usage ---
   const cw = data.context_window || {};
-  const usedPct = cw.used_percentage != null ? cw.used_percentage : null;
-
-  let usedTokens = cw.used_tokens != null ? cw.used_tokens
-                 : cw.input_tokens != null ? cw.input_tokens
-                 : null;
-  const totalTokens = cw.total_tokens != null ? cw.total_tokens
-                    : cw.max_tokens != null ? cw.max_tokens
-                    : (/1M/i.test(model) ? 1_000_000 : 200_000);
-
-  if (usedTokens == null && usedPct != null) {
-    usedTokens = Math.round(totalTokens * usedPct / 100);
-  }
+  const usage = cw.current_usage;
+  const usedTokens = cw.total_input_tokens != null ? cw.total_input_tokens
+                   : usage ? (usage.input_tokens || 0)
+                           + (usage.cache_creation_input_tokens || 0)
+                           + (usage.cache_read_input_tokens || 0)
+                   : null;
 
   // Bar scale: SMART_ZONE = 100%, regardless of model's actual window.
-  const SMART_ZONE = 100_000;
-  const barPct = usedTokens != null ? (usedTokens / SMART_ZONE) * 100 : usedPct;
-
-  const fmtTokens = (n) => {
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1).replace(/\.0$/, '') + 'M';
-    if (n >= 1_000) return Math.round(n / 1_000) + 'k';
-    return String(n);
-  };
+  const SMART_ZONE = 200_000;
+  const barPct = usedTokens != null ? (usedTokens / SMART_ZONE) * 100 : null;
 
   const c = {
     reset: '\x1b[0m',
@@ -102,10 +90,6 @@ process.stdin.on('end', () => {
   };
   const paint = (color, s) => color + s + c.reset;
 
-  // Bar zones (fixed by position, not by current fill level):
-  //   0–50%   → green   (cells 0–9 of 20)
-  //   50–80%  → yellow  (cells 10–15)
-  //   80–100% → red     (cells 16–19)
   const cellColor = (i, width) => {
     const cellPct = ((i + 1) / width) * 100;
     if (cellPct > 80) return c.red;
@@ -113,7 +97,7 @@ process.stdin.on('end', () => {
     return c.green;
   };
 
-  const makeBar = (pct, width = 20) => {
+  const makeBar = (pct, width = 10) => {
     const p = Math.max(0, Math.min(100, pct));
     const filled = Math.round((p / 100) * width);
     let bar = '';
@@ -121,9 +105,7 @@ process.stdin.on('end', () => {
       bar += i < filled ? paint(cellColor(i, width), '▰') : paint(c.gray, '▱');
     }
     const labelColor = filled > 0 ? cellColor(filled - 1, width) : c.gray;
-    return paint(c.gray, '0% ') + bar
-         + ' ' + paint(c.bold + labelColor, Math.round(Math.max(0, pct)) + '%')
-         + paint(c.gray, '/' + fmtTokens(SMART_ZONE));
+    return bar + ' ' + paint(c.bold + labelColor, Math.round(Math.max(0, pct)) + '%');
   };
 
   const badge = cavemanBadge();
