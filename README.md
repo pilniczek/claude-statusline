@@ -1,6 +1,6 @@
 # claude-statusline
 
-A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", and 5-hour and weekly plan usage, and an optional caveman-level badge.
+A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", 5-hour and weekly plan usage, and an optional caveman-level badge.
 
 ```
 📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ h50% wk70% │ 🦴 full
@@ -44,7 +44,7 @@ Nothing to configure, and nothing to install: without the plugin the file never 
 
 ## Configure
 
-Edit the constants at the top of `statusline.js` — `SMART_ZONE`, bar width, color thresholds, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, icon, separator, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
+Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PROJECT_ICON`, `SEPARATOR`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
 
 ## Preview locally
 

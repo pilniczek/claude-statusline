@@ -6,8 +6,15 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+// Bar scale: SMART_ZONE = 100%, regardless of model's actual window.
+const SMART_ZONE = 200_000;
+const BAR_WIDTH = 10;
+const BAR_YELLOW_ABOVE = 50;
+const BAR_RED_ABOVE = 80;
 const RATE_LIMIT_YELLOW_ABOVE = 50;
 const RATE_LIMIT_RED_ABOVE = 90;
+const PROJECT_ICON = '📁';
+const SEPARATOR = ' │ ';
 
 // --- Caveman badge ---
 // The caveman plugin (github.com/juliusbrussee/caveman) keeps the active
@@ -75,8 +82,6 @@ process.stdin.on('end', () => {
                            + (usage.cache_read_input_tokens || 0)
                    : null;
 
-  // Bar scale: SMART_ZONE = 100%, regardless of model's actual window.
-  const SMART_ZONE = 200_000;
   const barPct = usedTokens != null ? (usedTokens / SMART_ZONE) * 100 : null;
 
   const c = {
@@ -95,12 +100,12 @@ process.stdin.on('end', () => {
 
   const cellColor = (i, width) => {
     const cellPct = ((i + 1) / width) * 100;
-    if (cellPct > 80) return c.red;
-    if (cellPct > 50) return c.yellow;
+    if (cellPct > BAR_RED_ABOVE) return c.red;
+    if (cellPct > BAR_YELLOW_ABOVE) return c.yellow;
     return c.green;
   };
 
-  const makeBar = (pct, width = 10) => {
+  const makeBar = (pct, width = BAR_WIDTH) => {
     const p = Math.max(0, Math.min(100, pct));
     const filled = Math.round((p / 100) * width);
     let bar = '';
@@ -120,7 +125,7 @@ process.stdin.on('end', () => {
     const tokens = [['h', rateLimits.five_hour], ['wk', rateLimits.seven_day]]
       .filter(([, w]) => w && typeof w.used_percentage === 'number')
       .map(([label, w]) => {
-        const n = Math.round(w.used_percentage);
+        const n = Math.max(0, Math.round(w.used_percentage));
         return paint(c.bold + rateLimitColor(n), label + n + '%');
       });
     return tokens.length ? tokens.join(' ') : null;
@@ -130,7 +135,7 @@ process.stdin.on('end', () => {
   const badge = cavemanBadge();
 
   const parts = [];
-  if (projectName) parts.push(paint(c.bold, '📁 ' + projectName));
+  if (projectName) parts.push(paint(c.bold, PROJECT_ICON + ' ' + projectName));
   if (model) parts.push(paint(c.cyan, model));
   if (barPct != null) parts.push(makeBar(barPct));
   if (limits) parts.push(limits);
@@ -138,6 +143,6 @@ process.stdin.on('end', () => {
   // its position whether or not caveman is active.
   if (badge) parts.push(paint(c.bold + c.orange, badge));
 
-  const sep = paint(c.gray, ' │ ');
+  const sep = paint(c.gray, SEPARATOR);
   process.stdout.write(parts.join(sep));
 });
