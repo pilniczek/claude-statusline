@@ -187,7 +187,7 @@ process.stdin.on('end', () => {
                                : c.green;
 
   const rateLimitToken = (label, window) => {
-    if (!window || typeof window.used_percentage !== 'number') return label + '-';
+    if (!window || typeof window.used_percentage !== 'number') return label + '-%';
     const n = Math.max(0, Math.round(window.used_percentage));
     return paint(rateLimitColor(n), label + n + '%');
   };
