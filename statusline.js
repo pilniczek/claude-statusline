@@ -6,6 +6,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+const RATE_LIMIT_YELLOW_ABOVE = 50;
+const RATE_LIMIT_RED_ABOVE = 90;
+
 // --- Caveman badge ---
 // The caveman plugin (github.com/juliusbrussee/caveman) keeps the active
 // intensity level in a flag file written by its hooks. It is the only way to
@@ -108,12 +111,29 @@ process.stdin.on('end', () => {
     return bar + ' ' + paint(c.bold + labelColor, Math.round(Math.max(0, pct)) + '%');
   };
 
+  const rateLimitColor = (n) => n > RATE_LIMIT_RED_ABOVE ? c.red
+                               : n > RATE_LIMIT_YELLOW_ABOVE ? c.yellow
+                               : c.green;
+
+  const rateLimitPart = (rateLimits) => {
+    if (!rateLimits) return null;
+    const tokens = [['h', rateLimits.five_hour], ['wk', rateLimits.seven_day]]
+      .filter(([, w]) => w && typeof w.used_percentage === 'number')
+      .map(([label, w]) => {
+        const n = Math.round(w.used_percentage);
+        return paint(c.bold + rateLimitColor(n), label + n + '%');
+      });
+    return tokens.length ? tokens.join(' ') : null;
+  };
+
+  const limits = rateLimitPart(data.rate_limits);
   const badge = cavemanBadge();
 
   const parts = [];
   if (projectName) parts.push(paint(c.bold, '📁 ' + projectName));
   if (model) parts.push(paint(c.cyan, model));
   if (barPct != null) parts.push(makeBar(barPct));
+  if (limits) parts.push(limits);
   // Badge last: the bar is the thing being watched continuously, so it keeps
   // its position whether or not caveman is active.
   if (badge) parts.push(paint(c.bold + c.orange, badge));

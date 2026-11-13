@@ -35,6 +35,10 @@ const scenarios = [
   { label: 'red    (170k)', used_tokens: 170_000, caveman: null },
   { label: 'full   (200k)', used_tokens: 200_000, caveman: null },
   { label: 'over   (500k)', used_tokens: 500_000, caveman: null },
+  { label: 'limits: green',  used_tokens: 30_000,  caveman: null, rate_limits: { five_hour: { used_percentage: 20 }, seven_day: { used_percentage: 35 } } },
+  { label: 'limits: yellow', used_tokens: 30_000,  caveman: null, rate_limits: { five_hour: { used_percentage: 60 }, seven_day: { used_percentage: 75 } } },
+  { label: 'limits: red',    used_tokens: 30_000,  caveman: null, rate_limits: { five_hour: { used_percentage: 95 }, seven_day: { used_percentage: 100 } } },
+  { label: 'limits: 5h only', used_tokens: 30_000, caveman: 'ultra', rate_limits: { five_hour: { used_percentage: 40 } } },
   { label: 'badge: none',   used_tokens: 30_000,  caveman: null },
   { label: 'badge: full',   used_tokens: 30_000,  caveman: 'full' },
   { label: 'badge: ultra',  used_tokens: 30_000,  caveman: 'ultra' },
@@ -49,8 +53,9 @@ const render = (scn) => new Promise((resolve, reject) => {
     model: { display_name: 'Opus 4.7 (1M context)' },
     context_window: { total_input_tokens: scn.used_tokens },
     workspace: { project_dir: 'C:/tmp/demo' },
+    rate_limits: scn.rate_limits,
   });
-  process.stdout.write(scn.label.padEnd(14) + '  ');
+  process.stdout.write(scn.label.padEnd(15) + '  ');
   const child = spawn(process.execPath, [SCRIPT], {
     stdio: ['pipe', 'inherit', 'inherit'],
     env: {

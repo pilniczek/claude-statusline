@@ -1,9 +1,9 @@
 # claude-statusline
 
-A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", and an optional caveman-level badge.
+A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", and 5-hour and weekly plan usage, and an optional caveman-level badge.
 
 ```
-📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ 🦴 full
+📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ h50% wk70% │ 🦴 full
 ```
 
 ## Install
@@ -20,6 +20,12 @@ Requires Node.js on PATH. Point Claude Code at the script via `~/.claude/setting
 ```
 
 Restart Claude Code (or start a new session).
+
+## Plan usage
+
+`h50% wk70%` shows how much of the 5-hour (`h`) and weekly (`wk`) plan limits you have used. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
+
+Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. Without them the readout is hidden; if only one window is reported, only that one shows. Reset times and the gateway `spend_limit` are not shown.
 
 ## Caveman badge
 
@@ -38,7 +44,7 @@ Nothing to configure, and nothing to install: without the plugin the file never 
 
 ## Configure
 
-Edit the constants at the top of `statusline.js` — `SMART_ZONE`, bar width, color thresholds, icon, separator, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
+Edit the constants at the top of `statusline.js` — `SMART_ZONE`, bar width, color thresholds, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, icon, separator, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
 
 ## Preview locally
 
