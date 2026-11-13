@@ -118,7 +118,8 @@ const readFollowUpCount = (root) => {
 };
 
 const reportBadge = (root, linesChanged) => {
-  const count = root ? readFollowUpCount(root) : undefined;
+  if (!root) return REPORT_ICON + ' -';
+  const count = readFollowUpCount(root);
   if (count === null) return null;
   if (count === undefined) return REPORT_ICON + (linesChanged > 0 ? REPORT_MISSING_ICON : ' -');
   return count > 0 ? REPORT_ICON + ' ' + count : REPORT_ICON + REPORT_DONE_ICON;

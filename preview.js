@@ -62,6 +62,7 @@ const scenarios = [
   { label: 'report: done',    used_tokens: 30_000, caveman: null, workspace: true, learnings: 0, follow_ups: 0 },
   { label: 'report: missing', used_tokens: 30_000, caveman: null, workspace: true, learnings: 0, lines_changed: 12 },
   { label: 'report: n/a',     used_tokens: 30_000, caveman: 'ultra', workspace: true, learnings: 0 },
+  { label: 'report: no git', used_tokens: 30_000, caveman: null, lines_changed: 12 },
   { label: 'badge: none',   used_tokens: 30_000,  caveman: null },
   { label: 'badge: full',   used_tokens: 30_000,  caveman: 'full' },
   { label: 'badge: ultra',  used_tokens: 30_000,  caveman: 'ultra' },
