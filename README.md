@@ -23,7 +23,7 @@ Restart Claude Code (or start a new session).
 
 ## Plan usage
 
-`h50% wk70%` shows how much of the 5-hour (`h`) and weekly (`wk`) plan limits you have used. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
+`h50% wk70%` shows how much of the 5-hour (`h`) and weekly (`wk`) plan limits you have used. Values round up, so any fraction past a whole number shows the next one. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
 
 Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. A window Claude Code does not report - no subscription, before the first response, or right after a window expires - shows a dash, e.g. `h-% wk71%`. Reset times and the gateway `spend_limit` are not shown.
 
