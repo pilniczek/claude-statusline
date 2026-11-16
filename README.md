@@ -3,7 +3,7 @@
 A custom [Claude Code](https://claude.com/claude-code) status line: model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, an optional caveman-level badge, and the project name last.
 
 ```
-Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84 📁 $0.55 │ h 50% w 70% │ 🧠 3 📋 2 🦴 full │ 📁 important
+Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $  6.84 📁 $  0.55 │ h 50% w 70% │ 🧠  3 📋  2 🦴 full │ 📁 important
 ```
 
 ## Install
@@ -29,7 +29,7 @@ Claude Code sends these only for claude.ai subscriptions, and only after the fir
 
 ## Cost
 
-`$6.84 📁 $0.55` is what you have spent today: first across all projects, then for the current project. It follows the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension. Figures can differ slightly, see below.
+`$  6.84 📁 $  0.55` is what you have spent today: first across all projects, then for the current project. Amounts are padded to a fixed width (`COST_DIGITS`) up to $999.99. It follows the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension. Figures can differ slightly, see below.
 
 - Source: Claude Code's own transcripts in `~/.claude/projects` (or `$CLAUDE_CONFIG_DIR/projects`). Only files changed since local midnight are read, and only their records from today count.
 - Each response counts once, deduped by message and request id, like the extension.
@@ -59,15 +59,15 @@ Known limits:
 
 ## Reflect and work report badges
 
-`🧠 3` counts the learnings [claude-reflect](https://github.com/BayramAnnakov/claude-reflect) has queued for this project and waiting for `/reflect`. It shows `🧠 0` when the queue is empty and disappears only when Claude Code sends no transcript path.
+`🧠  3` counts the learnings [claude-reflect](https://github.com/BayramAnnakov/claude-reflect) has queued for this project and waiting for `/reflect`. It shows `🧠  0` when the queue is empty and disappears only when Claude Code sends no transcript path.
 
 `📋` tracks `WORK-REPORT.md` from the work-report skill, at the root of the current git repo:
 
 ```
-📋 2      report exists, 2 open follow-ups
-📋✅      report exists, no follow-ups
-📋❌      no report, and this session changed code
-📋 -      no report and nothing changed, or not in a git repo
+📋  2     report exists, 2 open follow-ups
+📋 ✅     report exists, no follow-ups
+📋 ❌     no report, and this session changed code
+📋  -     no report and nothing changed, or not in a git repo
 ```
 
 Both files are only counted, never printed. A symlinked or oversized file hides its badge.
@@ -89,7 +89,7 @@ Nothing to configure, and nothing to install: without the plugin the file never 
 
 ## Configure
 
-Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PERCENT_DIGITS`, `PROJECT_ICON`, `SEPARATOR`, `COST_PROJECT_ICON`, `REFLECT_ICON`, `REPORT_ICON`, `REPORT_DONE_ICON`, `REPORT_MISSING_ICON`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
+Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PERCENT_DIGITS`, `COUNT_DIGITS`, `COST_DIGITS`, `PROJECT_ICON`, `SEPARATOR`, `COST_PROJECT_ICON`, `REFLECT_ICON`, `REPORT_ICON`, `REPORT_DONE_ICON`, `REPORT_MISSING_ICON`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
 
 ## Preview locally
 

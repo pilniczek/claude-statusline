@@ -14,6 +14,8 @@ const BAR_RED_ABOVE = 80;
 const RATE_LIMIT_YELLOW_ABOVE = 50;
 const RATE_LIMIT_RED_ABOVE = 90;
 const PERCENT_DIGITS = 3;
+const COUNT_DIGITS = 2;
+const COST_DIGITS = 6;
 const PROJECT_ICON = '📁';
 const SEPARATOR = ' │ ';
 const REFLECT_ICON = '🧠';
@@ -70,6 +72,8 @@ const cavemanBadge = () => {
   return level === null ? null : CAVEMAN_ICON + ' ' + level;
 };
 
+const padCount = (value) => String(value).padStart(COUNT_DIGITS);
+
 const readSafeFile = (filePath, maxBytes) => {
   const st = fs.lstatSync(filePath);
   if (st.isSymbolicLink() || !st.isFile() || st.size > maxBytes) return null;
@@ -90,7 +94,7 @@ const readLearningsCount = (transcriptPath) => {
 
 const reflectBadge = (transcriptPath) => {
   const count = readLearningsCount(transcriptPath);
-  return count === null ? null : REFLECT_ICON + ' ' + count;
+  return count === null ? null : REFLECT_ICON + ' ' + padCount(count);
 };
 
 const findRepoRoot = (startDir) => {
@@ -124,11 +128,11 @@ const readFollowUpCount = (root) => {
 };
 
 const reportBadge = (root, linesChanged) => {
-  if (!root) return REPORT_ICON + ' -';
+  if (!root) return REPORT_ICON + ' ' + padCount('-');
   const count = readFollowUpCount(root);
   if (count === null) return null;
-  if (count === undefined) return REPORT_ICON + (linesChanged > 0 ? REPORT_MISSING_ICON : ' -');
-  return count > 0 ? REPORT_ICON + ' ' + count : REPORT_ICON + REPORT_DONE_ICON;
+  if (count === undefined) return REPORT_ICON + ' ' + (linesChanged > 0 ? REPORT_MISSING_ICON : padCount('-'));
+  return REPORT_ICON + ' ' + (count > 0 ? padCount(count) : REPORT_DONE_ICON);
 };
 
 const perMillion = (input, output, write5m, write1h, read) => ({
@@ -417,8 +421,10 @@ const readTodayCost = (dir, projectDir, now) => {
   }
 };
 
-const costPart = (total, project) => '$' + total.toFixed(2)
-  + (project === null ? '' : ' ' + COST_PROJECT_ICON + ' $' + project.toFixed(2));
+const costAmount = (usd) => '$' + usd.toFixed(2).padStart(COST_DIGITS);
+
+const costPart = (total, project) => costAmount(total)
+  + (project === null ? '' : ' ' + COST_PROJECT_ICON + ' ' + costAmount(project));
 
 const padPercent = (value) => String(value).padStart(PERCENT_DIGITS) + '%';
 
@@ -470,6 +476,7 @@ process.stdin.on('end', () => {
   };
 
   const makeBar = (pct, width = BAR_WIDTH) => {
+    if (pct == null) return paint(c.gray, '▱'.repeat(width) + ' ' + padPercent('-'));
     const p = Math.max(0, Math.min(100, pct));
     const filled = Math.round((p / 100) * width);
     let bar = '';
@@ -506,7 +513,7 @@ process.stdin.on('end', () => {
 
   const todayCost = readTodayCost(configDir(), data.workspace && data.workspace.project_dir, new Date());
   const groups = [
-    [model && paint(c.cyan, model), barPct != null && makeBar(barPct)],
+    [model && paint(c.cyan, model), makeBar(barPct)],
     [todayCost && costPart(todayCost.total, todayCost.project)],
     [limits],
     [reflect, report, badge && paint(c.orange, badge)],
