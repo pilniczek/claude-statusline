@@ -13,6 +13,7 @@ const BAR_YELLOW_ABOVE = 50;
 const BAR_RED_ABOVE = 80;
 const RATE_LIMIT_YELLOW_ABOVE = 50;
 const RATE_LIMIT_RED_ABOVE = 90;
+const PERCENT_DIGITS = 3;
 const PROJECT_ICON = '📁';
 const SEPARATOR = ' │ ';
 const REFLECT_ICON = '🧠';
@@ -419,6 +420,8 @@ const readTodayCost = (dir, projectDir, now) => {
 const costPart = (total, project) => '$' + total.toFixed(2)
   + (project === null ? '' : ' ' + COST_PROJECT_ICON + ' $' + project.toFixed(2));
 
+const padPercent = (value) => String(value).padStart(PERCENT_DIGITS) + '%';
+
 const chunks = [];
 process.stdin.on('data', d => chunks.push(d));
 process.stdin.on('end', () => {
@@ -474,7 +477,7 @@ process.stdin.on('end', () => {
       bar += i < filled ? paint(cellColor(i, width), '▰') : paint(c.gray, '▱');
     }
     const labelColor = filled > 0 ? cellColor(filled - 1, width) : c.gray;
-    return bar + ' ' + paint(labelColor, Math.round(Math.max(0, pct)) + '%');
+    return bar + ' ' + paint(labelColor, padPercent(Math.round(Math.max(0, pct))));
   };
 
   const rateLimitColor = (n) => n > RATE_LIMIT_RED_ABOVE ? c.red
@@ -482,9 +485,9 @@ process.stdin.on('end', () => {
                                : c.green;
 
   const rateLimitToken = (label, window) => {
-    if (!window || typeof window.used_percentage !== 'number') return label + '-%';
+    if (!window || typeof window.used_percentage !== 'number') return label + padPercent('-');
     const n = Math.max(0, Math.ceil(window.used_percentage));
-    return paint(rateLimitColor(n), label + n + '%');
+    return paint(rateLimitColor(n), label + padPercent(n));
   };
 
   const rateLimitPart = (rateLimits) => {

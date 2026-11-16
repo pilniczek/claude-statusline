@@ -3,7 +3,7 @@
 A custom [Claude Code](https://claude.com/claude-code) status line: model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, an optional caveman-level badge, and the project name last.
 
 ```
-Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ $6.84 📁 $0.55 │ h50% w70% │ 🧠 3 │ 📋 2 │ 🦴 full │ 📁 important
+Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84 📁 $0.55 │ h 50% w 70% │ 🧠 3 │ 📋 2 │ 🦴 full │ 📁 important
 ```
 
 ## Install
@@ -23,9 +23,9 @@ Restart Claude Code (or start a new session).
 
 ## Plan usage
 
-`h50% w70%` shows how much of the 5-hour (`h`) and weekly (`w`) plan limits you have used. Values round up, so any fraction past a whole number shows the next one. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
+`h 50% w 70%` shows how much of the 5-hour (`h`) and weekly (`w`) plan limits you have used. Values round up, so any fraction past a whole number shows the next one. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
 
-Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. A window Claude Code does not report - no subscription, before the first response, or right after a window expires - shows a dash, e.g. `h-% w71%`. Reset times and the gateway `spend_limit` are not shown.
+Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. A window Claude Code does not report - no subscription, before the first response, or right after a window expires - shows a dash, e.g. `h  -% w 71%`. Reset times and the gateway `spend_limit` are not shown.
 
 ## Cost
 
@@ -89,7 +89,7 @@ Nothing to configure, and nothing to install: without the plugin the file never 
 
 ## Configure
 
-Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PROJECT_ICON`, `SEPARATOR`, `COST_PROJECT_ICON`, `REFLECT_ICON`, `REPORT_ICON`, `REPORT_DONE_ICON`, `REPORT_MISSING_ICON`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
+Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PERCENT_DIGITS`, `PROJECT_ICON`, `SEPARATOR`, `COST_PROJECT_ICON`, `REFLECT_ICON`, `REPORT_ICON`, `REPORT_DONE_ICON`, `REPORT_MISSING_ICON`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
 
 ## Preview locally
 
