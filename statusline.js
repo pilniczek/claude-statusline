@@ -217,7 +217,13 @@ const listTodayTranscripts = (projectsDir, sinceMs) => {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) walk(full);
       else if (entry.isFile() && entry.name.endsWith('.jsonl')) {
-        const st = fs.statSync(full);
+        let st;
+        try {
+          st = fs.statSync(full);
+        } catch (e) {
+          if (e.code === 'ENOENT') continue;
+          throw e;
+        }
         if (st.mtimeMs >= sinceMs) found.push({ path: full, size: st.size });
       }
     }
@@ -288,14 +294,42 @@ const isUnder = (cwd, root) => {
 const localDayKey = (now) => [now.getFullYear(), now.getMonth() + 1, now.getDate()]
   .map((n) => String(n).padStart(2, '0')).join('-');
 
-const isEntry = (e) => e && typeof e === 'object'
-  && typeof e.id === 'string' && typeof e.w === 'string'
+const isCachedEntry = (e, cwdCount) => e && typeof e === 'object'
   && (e.m === null || typeof e.m === 'string') && (e.r === null || typeof e.r === 'string')
+  && Number.isInteger(e.o) && Number.isInteger(e.w) && e.w >= 0 && e.w < cwdCount
   && Number.isFinite(e.t) && Number.isFinite(e.c);
 
 const isCachedFile = (f) => f && typeof f === 'object'
   && Number.isFinite(f.size) && Number.isFinite(f.offset) && f.offset >= 0
-  && Array.isArray(f.entries) && f.entries.every(isEntry);
+  && Array.isArray(f.cwds) && f.cwds.every((w) => typeof w === 'string')
+  && Array.isArray(f.entries) && f.entries.every((e) => isCachedEntry(e, f.cwds.length));
+
+const reduceByPair = (entries) => {
+  const kept = new Map();
+  for (const e of entries) {
+    const key = e.m || e.r ? JSON.stringify([e.m, e.r]) : 'line:' + e.id;
+    const prev = kept.get(key);
+    if (!prev || e.t > prev.t) kept.set(key, e);
+  }
+  return [...kept.values()];
+};
+
+const packEntries = (entries) => {
+  const cwds = [];
+  const index = new Map();
+  const packed = reduceByPair(entries).map((e) => {
+    if (!index.has(e.w)) {
+      index.set(e.w, cwds.length);
+      cwds.push(e.w);
+    }
+    return { m: e.m, r: e.r, o: Number(e.id.slice(e.id.lastIndexOf(':') + 1)), t: e.t, c: e.c, w: index.get(e.w) };
+  });
+  return { cwds, entries: packed };
+};
+
+const unpackEntries = (filePath, cached) => cached.entries.map((e) => ({
+  m: e.m, r: e.r, id: filePath + ':' + e.o, t: e.t, c: e.c, w: cached.cwds[e.w],
+}));
 
 const loadCostCache = (file, day) => {
   const empty = { day, files: {} };
@@ -351,20 +385,25 @@ const readTodayCost = (dir, projectDir, now) => {
     const cacheFile = path.join(dir, COST_CACHE_FILE);
     const cache = loadCostCache(cacheFile, day);
     const nextFiles = {};
+    const entries = [];
+    let changed = Object.keys(cache.files).length !== files.length;
     for (const file of files) {
       const cached = cache.files[file.path];
+      if (cached && cached.size === file.size) {
+        nextFiles[file.path] = cached;
+        entries.push(...unpackEntries(file.path, cached));
+        continue;
+      }
       const start = cached && file.size >= cached.offset ? cached.offset : 0;
-      const kept = start > 0 ? cached.entries : [];
+      const kept = start > 0 ? unpackEntries(file.path, cached) : [];
       let chunk;
       try { chunk = readCompleteLines(file.path, start, file.size); } catch (_) { continue; }
-      nextFiles[file.path] = {
-        size: file.size,
-        offset: start + chunk.bytes,
-        entries: kept.concat(parseEntries(chunk.text, file.path, start, dayStart, dayEnd)),
-      };
+      const fileEntries = kept.concat(parseEntries(chunk.text, file.path, start, dayStart, dayEnd));
+      nextFiles[file.path] = { size: file.size, offset: start + chunk.bytes, ...packEntries(fileEntries) };
+      entries.push(...fileEntries);
+      changed = true;
     }
-    saveCostCache(cacheFile, { day, files: nextFiles });
-    const entries = Object.values(nextFiles).flatMap((f) => f.entries);
+    if (changed) saveCostCache(cacheFile, { day, files: nextFiles });
     let total = 0;
     let project = projectDir ? 0 : null;
     for (const e of dedupeEntries(entries)) {
