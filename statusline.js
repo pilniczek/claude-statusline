@@ -428,11 +428,12 @@ process.stdin.on('end', () => {
   // --- Project name (basename of project dir or cwd) ---
   const projectPath = (data.workspace && (data.workspace.project_dir || data.workspace.current_dir))
                    || data.cwd || '';
-  const projectName = projectPath.replace(/[\\/]+$/, '').split(/[\\/]/).pop();
+  const projectName = projectPath.replace(/[\\/]+$/, '').split(/[\\/]/).pop().trim();
 
   // --- Model display name ---
   const model = ((data.model && data.model.display_name) || '')
-    .replace(/\s*context\b/i, '');
+    .replace(/\s*context\b/i, '')
+    .trim();
 
   // --- Context usage ---
   const cw = data.context_window || {};
