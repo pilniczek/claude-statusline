@@ -6,6 +6,21 @@ A custom [Claude Code](https://claude.com/claude-code) status line: model, a 10-
 Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84   📁 $0.55 │ h50% w70% │ 🧠 3 📋 2 🦴 full │ 📁 important
 ```
 
+## Layout
+
+`│` separates five groups: model and bar, cost, plan usage, badges (`🧠 📋 🦴`), project. Parts inside a group are joined by a space.
+
+Each group keeps a fixed width while values move, so the line doesn't jump:
+
+| Part | Slot | Example |
+|---|---|---|
+| Bar label | `PERCENT_DIGITS` (3), padded on the left | `  0%`, ` 15%`, `111%` |
+| Cost | `COST_DIGITS` (5) per amount, spare space before `📁` | `$6.84   📁 $0.55`, `$16.79  📁 $9.12` |
+| Plan usage | `RATE_LIMIT_DIGITS` (2) per value, spare space before `w` | `h6%  w94%`, `h20% w35%` |
+| `🧠` / `📋` | `COUNT_DIGITS` (2) after the icon | `🧠 3`, `🧠11`, `📋 -`, `📋 ✕`, `📋✅` |
+
+A value past its slot (cost of $100 or more, a plan limit at 100%, 100 or more learnings) widens its group by one cell. With no token data the bar shows empty (`▱▱▱▱▱▱▱▱▱▱   -%`) instead of disappearing. The model name, caveman badge and project name are not padded; the project comes last so its length moves nothing.
+
 ## Install
 
 Requires Node.js on PATH. Point Claude Code at the script via `~/.claude/settings.json` (Windows: `C:\Users\<you>\.claude\settings.json`):
@@ -93,7 +108,7 @@ Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, 
 
 ## Preview locally
 
-Render every interesting tier at once — green / yellow / red, full, and overflow past the smart zone, plus the badge states. Badge rows are driven by throwaway fixture config dirs, not by the caveman level live on this machine, so both badge and no-badge always render:
+Render every interesting tier at once — green / yellow / red, full, and overflow past the smart zone, plus plan usage, cost (fixture transcripts), reflect, work report and caveman badge states. Badge rows are driven by throwaway fixture config dirs, not by the caveman level live on this machine, so both badge and no-badge always render:
 
 ```
 node ./preview.js
