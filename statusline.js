@@ -14,6 +14,7 @@ const BAR_RED_ABOVE = 80;
 const RATE_LIMIT_YELLOW_ABOVE = 50;
 const RATE_LIMIT_RED_ABOVE = 90;
 const PERCENT_DIGITS = 3;
+const RATE_LIMIT_DIGITS = 2;
 const COUNT_DIGITS = 2;
 const COST_DIGITS = 6;
 const PROJECT_ICON = '📁';
@@ -508,7 +509,7 @@ process.stdin.on('end', () => {
     const limits = rateLimits || {};
     const hour = rateLimitValue(limits.five_hour);
     const week = rateLimitValue(limits.seven_day);
-    return rateLimitToken('h', hour) + slack(hour, PERCENT_DIGITS) + slack(week, PERCENT_DIGITS) + ' '
+    return rateLimitToken('h', hour) + slack(hour, RATE_LIMIT_DIGITS) + slack(week, RATE_LIMIT_DIGITS) + ' '
       + rateLimitToken('w', week);
   };
 
