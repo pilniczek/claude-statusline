@@ -3,7 +3,7 @@
 A custom [Claude Code](https://claude.com/claude-code) status line: model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, an optional caveman-level badge, and the project name last.
 
 ```
-Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84     📁 $0.55 │ h50% w70% │ 🧠 3 📋 2 🦴 full │ 📁 important
+Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84   📁 $0.55 │ h50% w70% │ 🧠 3 📋 2 🦴 full │ 📁 important
 ```
 
 ## Install
@@ -29,7 +29,7 @@ Claude Code sends these only for claude.ai subscriptions, and only after the fir
 
 ## Cost
 
-`$6.84     📁 $0.55` is what you have spent today: first across all projects, then for the current project. The part keeps a fixed width up to $999.99 (`COST_DIGITS`): the spare space goes before `📁`. It follows the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension. Figures can differ slightly, see below.
+`$6.84   📁 $0.55` is what you have spent today: first across all projects, then for the current project. The part keeps a fixed width up to $99.99 (`COST_DIGITS`, larger amounts add a cell): the spare space goes before `📁`. It follows the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension. Figures can differ slightly, see below.
 
 - Source: Claude Code's own transcripts in `~/.claude/projects` (or `$CLAUDE_CONFIG_DIR/projects`). Only files changed since local midnight are read, and only their records from today count.
 - Each response counts once, deduped by message and request id, like the extension.
