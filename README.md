@@ -29,17 +29,33 @@ Claude Code sends these only for claude.ai subscriptions, and only after the fir
 
 ## Cost
 
-`$6.84 📁 $0.55` is what you have spent today: first across all projects, then for the current project. It matches the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension.
+`$6.84 📁 $0.55` is what you have spent today: first across all projects, then for the current project. It follows the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension. Figures can differ slightly, see below.
 
 - Source: Claude Code's own transcripts in `~/.claude/projects` (or `$CLAUDE_CONFIG_DIR/projects`). Only files changed since local midnight are read, and only their records from today count.
 - Each response counts once, deduped by message and request id, like the extension.
 - Price: tokens times the model's rate, from the Claude-only `CLAUDE_RATES` table in `statusline.js`. Unknown Claude models fall back to their family's rate. Other providers count as $0. Update the table when Anthropic changes prices.
-- Project: sessions whose working directory is the project dir or inside it, so worktrees under the repo count. Unlike the extension, `/a/foo` does not also catch `/a/foobar`.
+- Project: sessions whose working directory is the project dir or inside it, so worktrees under the repo count.
 - It is an estimate at API prices, not a bill. On a subscription it shows what the usage would cost at API rates.
 
 No `project_dir` in the payload shows only the total. A failure hides the part.
 
 To stay fast, it keeps how far each transcript was read in `~/.claude/statusline-cost-cache.json`, so each refresh parses only new lines. The cache resets at midnight and is safe to delete.
+
+Known differences from the extension:
+
+- Project match uses a path boundary: `/a/foo` does not also catch `/a/foobar`.
+- Project root is Claude Code's `project_dir`; the extension uses the first VS Code workspace folder.
+- A record without `cwd`, or a session that ran outside the project, counts only to the total. The extension also matches by transcript folder name.
+- Duplicates are matched within today only. A response logged on both sides of midnight can count differently.
+- On a tie between duplicate copies, the first file read wins; the extension picks by file time.
+- Plan usage rounds up; the extension rounds to nearest, so it can show 1% less. The extension also polls the usage API, while the status line updates after each response.
+
+Known limits:
+
+- Every refresh lists every transcript ever written, so the scan grows with history (`cleanupPeriodDays` bounds it). An unreadable folder under `projects` hides the part.
+- The first read of a large transcript loads it whole.
+- A transcript rewritten in place is noticed only when it gets smaller.
+- A refresh killed mid-write can leave a `statusline-cost-cache.json.<pid>.tmp` file. Safe to delete.
 
 ## Reflect and work report badges
 
