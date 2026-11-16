@@ -66,7 +66,7 @@ Known limits:
 ```
 📋  2     report exists, 2 open follow-ups
 📋 ✅     report exists, no follow-ups
-📋  ✖     no report, and this session changed code
+📋  ✕     no report, and this session changed code
 📋  -     no report and nothing changed, or not in a git repo
 ```
 
