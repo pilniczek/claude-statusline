@@ -194,7 +194,7 @@ process.stdin.on('end', () => {
 
   const rateLimitPart = (rateLimits) => {
     const limits = rateLimits || {};
-    return rateLimitToken('h', limits.five_hour) + ' ' + rateLimitToken('wk', limits.seven_day);
+    return rateLimitToken('h', limits.five_hour) + ' ' + rateLimitToken('w', limits.seven_day);
   };
 
   const limits = rateLimitPart(data.rate_limits);

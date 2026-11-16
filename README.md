@@ -3,7 +3,7 @@
 A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", 5-hour and weekly plan usage, claude-reflect and work report badges, and an optional caveman-level badge.
 
 ```
-📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ h50% wk70% │ 🧠 3 │ 📋 2 │ 🦴 full
+📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ h50% w70% │ 🧠 3 │ 📋 2 │ 🦴 full
 ```
 
 ## Install
@@ -23,9 +23,9 @@ Restart Claude Code (or start a new session).
 
 ## Plan usage
 
-`h50% wk70%` shows how much of the 5-hour (`h`) and weekly (`wk`) plan limits you have used. Values round up, so any fraction past a whole number shows the next one. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
+`h50% w70%` shows how much of the 5-hour (`h`) and weekly (`w`) plan limits you have used. Values round up, so any fraction past a whole number shows the next one. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
 
-Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. A window Claude Code does not report - no subscription, before the first response, or right after a window expires - shows a dash, e.g. `h-% wk71%`. Reset times and the gateway `spend_limit` are not shown.
+Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. A window Claude Code does not report - no subscription, before the first response, or right after a window expires - shows a dash, e.g. `h-% w71%`. Reset times and the gateway `spend_limit` are not shown.
 
 ## Reflect and work report badges
 
