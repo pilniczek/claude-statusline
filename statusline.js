@@ -23,6 +23,8 @@ const REPORT_MISSING_ICON = '❌';
 const REPORT_MAX_BYTES = 262_144;
 const COST_PROJECT_ICON = '📁';
 const COST_TRANSCRIPT_MAX_BYTES = 268_435_456;
+const COST_CACHE_FILE = 'statusline-cost-cache.json';
+const COST_CACHE_MAX_BYTES = 8_388_608;
 
 // --- Caveman badge ---
 // The caveman plugin (github.com/juliusbrussee/caveman) keeps the active
@@ -283,6 +285,57 @@ const isUnder = (cwd, root) => {
   return c === r || c.startsWith(r + '/');
 };
 
+const localDayKey = (now) => [now.getFullYear(), now.getMonth() + 1, now.getDate()]
+  .map((n) => String(n).padStart(2, '0')).join('-');
+
+const isEntry = (e) => e && typeof e === 'object'
+  && typeof e.id === 'string' && typeof e.w === 'string'
+  && (e.m === null || typeof e.m === 'string') && (e.r === null || typeof e.r === 'string')
+  && Number.isFinite(e.t) && Number.isFinite(e.c);
+
+const isCachedFile = (f) => f && typeof f === 'object'
+  && Number.isFinite(f.size) && Number.isFinite(f.offset) && f.offset >= 0
+  && Array.isArray(f.entries) && f.entries.every(isEntry);
+
+const loadCostCache = (file, day) => {
+  const empty = { day, files: {} };
+  try {
+    const text = readSafeFile(file, COST_CACHE_MAX_BYTES);
+    if (text === null) return empty;
+    const cache = JSON.parse(text);
+    if (!cache || cache.day !== day || !cache.files || typeof cache.files !== 'object') return empty;
+    return Object.values(cache.files).every(isCachedFile) ? cache : empty;
+  } catch (_) {
+    return empty;
+  }
+};
+
+const saveCostCache = (file, cache) => {
+  const tmp = file + '.' + process.pid + '.tmp';
+  try {
+    fs.writeFileSync(tmp, JSON.stringify(cache));
+    fs.renameSync(tmp, file);
+  } catch (_) {
+    try { fs.unlinkSync(tmp); } catch (_) {}
+  }
+};
+
+const readCompleteLines = (filePath, start, size) => {
+  if (size - start > COST_TRANSCRIPT_MAX_BYTES) throw new Error('transcript chunk too large');
+  const st = fs.lstatSync(filePath);
+  if (st.isSymbolicLink() || !st.isFile()) throw new Error('not a regular file');
+  const buf = Buffer.alloc(Math.max(0, size - start));
+  const fd = fs.openSync(filePath, 'r');
+  let read;
+  try {
+    read = fs.readSync(fd, buf, 0, buf.length, start);
+  } finally {
+    fs.closeSync(fd);
+  }
+  const end = buf.lastIndexOf(0x0a, read - 1) + 1;
+  return { text: buf.toString('utf8', 0, end), bytes: end };
+};
+
 const readTodayCost = (dir, projectDir, now) => {
   try {
     const dayStart = localDayStart(now);
@@ -294,14 +347,24 @@ const readTodayCost = (dir, projectDir, now) => {
     } catch (e) {
       if (e.code !== 'ENOENT') throw e;
     }
-    const entries = [];
+    const day = localDayKey(now);
+    const cacheFile = path.join(dir, COST_CACHE_FILE);
+    const cache = loadCostCache(cacheFile, day);
+    const nextFiles = {};
     for (const file of files) {
-      let text;
-      try { text = readSafeFile(file.path, COST_TRANSCRIPT_MAX_BYTES); } catch (_) { continue; }
-      if (text === null) continue;
-      const complete = text.slice(0, text.lastIndexOf('\n') + 1);
-      entries.push(...parseEntries(complete, file.path, 0, dayStart, dayEnd));
+      const cached = cache.files[file.path];
+      const start = cached && file.size >= cached.offset ? cached.offset : 0;
+      const kept = start > 0 ? cached.entries : [];
+      let chunk;
+      try { chunk = readCompleteLines(file.path, start, file.size); } catch (_) { continue; }
+      nextFiles[file.path] = {
+        size: file.size,
+        offset: start + chunk.bytes,
+        entries: kept.concat(parseEntries(chunk.text, file.path, start, dayStart, dayEnd)),
+      };
     }
+    saveCostCache(cacheFile, { day, files: nextFiles });
+    const entries = Object.values(nextFiles).flatMap((f) => f.entries);
     let total = 0;
     let project = projectDir ? 0 : null;
     for (const e of dedupeEntries(entries)) {

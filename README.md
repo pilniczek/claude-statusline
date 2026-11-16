@@ -39,6 +39,8 @@ Claude Code sends these only for claude.ai subscriptions, and only after the fir
 
 No `project_dir` in the payload shows only the total. A failure hides the part.
 
+To stay fast, it keeps how far each transcript was read in `~/.claude/statusline-cost-cache.json`, so each refresh parses only new lines. The cache resets at midnight and is safe to delete.
+
 ## Reflect and work report badges
 
 `🧠 3` counts the learnings [claude-reflect](https://github.com/BayramAnnakov/claude-reflect) has queued for this project and waiting for `/reflect`. It shows `🧠 0` when the queue is empty and disappears only when Claude Code sends no transcript path.
