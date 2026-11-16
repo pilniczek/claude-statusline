@@ -1,9 +1,9 @@
 # claude-statusline
 
-A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, and an optional caveman-level badge.
+A custom [Claude Code](https://claude.com/claude-code) status line: model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, an optional caveman-level badge, and the project name last.
 
 ```
-📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ $6.84 📁 $0.55 │ h50% w70% │ 🧠 3 │ 📋 2 │ 🦴 full
+Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ $6.84 📁 $0.55 │ h50% w70% │ 🧠 3 │ 📋 2 │ 🦴 full │ 📁 important
 ```
 
 ## Install

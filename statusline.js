@@ -501,7 +501,6 @@ process.stdin.on('end', () => {
   const badge = cavemanBadge();
 
   const parts = [];
-  if (projectName) parts.push(PROJECT_ICON + ' ' + projectName);
   if (model) parts.push(paint(c.cyan, model));
   if (barPct != null) parts.push(makeBar(barPct));
   const todayCost = readTodayCost(configDir(), data.workspace && data.workspace.project_dir, new Date());
@@ -509,9 +508,8 @@ process.stdin.on('end', () => {
   parts.push(limits);
   if (reflect) parts.push(reflect);
   if (report) parts.push(report);
-  // Badge last: the bar is the thing being watched continuously, so it keeps
-  // its position whether or not caveman is active.
   if (badge) parts.push(paint(c.orange, badge));
+  if (projectName) parts.push(PROJECT_ICON + ' ' + projectName);
 
   const sep = paint(c.gray, SEPARATOR);
   process.stdout.write(parts.join(sep));
