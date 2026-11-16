@@ -94,7 +94,7 @@ const readLearningsCount = (transcriptPath) => {
 
 const reflectBadge = (transcriptPath) => {
   const count = readLearningsCount(transcriptPath);
-  return count === null ? null : REFLECT_ICON + ' ' + padCount(count);
+  return count === null ? null : REFLECT_ICON + padCount(count);
 };
 
 const findRepoRoot = (startDir) => {
@@ -128,11 +128,11 @@ const readFollowUpCount = (root) => {
 };
 
 const reportBadge = (root, linesChanged) => {
-  if (!root) return REPORT_ICON + ' ' + padCount('-');
+  if (!root) return REPORT_ICON + padCount('-');
   const count = readFollowUpCount(root);
   if (count === null) return null;
-  if (count === undefined) return REPORT_ICON + ' ' + padCount(linesChanged > 0 ? REPORT_MISSING_ICON : '-');
-  return REPORT_ICON + ' ' + (count > 0 ? padCount(count) : REPORT_DONE_ICON);
+  if (count === undefined) return REPORT_ICON + padCount(linesChanged > 0 ? REPORT_MISSING_ICON : '-');
+  return REPORT_ICON + (count > 0 ? padCount(count) : REPORT_DONE_ICON);
 };
 
 const perMillion = (input, output, write5m, write1h, read) => ({

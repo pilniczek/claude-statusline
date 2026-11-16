@@ -3,7 +3,7 @@
 A custom [Claude Code](https://claude.com/claude-code) status line: model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, an optional caveman-level badge, and the project name last.
 
 ```
-Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84     📁 $0.55 │ h50%   w70% │ 🧠  3 📋  2 🦴 full │ 📁 important
+Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84     📁 $0.55 │ h50%   w70% │ 🧠 3 📋 2 🦴 full │ 📁 important
 ```
 
 ## Install
@@ -59,15 +59,15 @@ Known limits:
 
 ## Reflect and work report badges
 
-`🧠  3` counts the learnings [claude-reflect](https://github.com/BayramAnnakov/claude-reflect) has queued for this project and waiting for `/reflect`. It shows `🧠  0` when the queue is empty and disappears only when Claude Code sends no transcript path.
+`🧠 3` counts the learnings [claude-reflect](https://github.com/BayramAnnakov/claude-reflect) has queued for this project and waiting for `/reflect`. It shows `🧠 0` when the queue is empty and disappears only when Claude Code sends no transcript path.
 
 `📋` tracks `WORK-REPORT.md` from the work-report skill, at the root of the current git repo:
 
 ```
-📋  2     report exists, 2 open follow-ups
-📋 ✅     report exists, no follow-ups
-📋  ✕     no report, and this session changed code
-📋  -     no report and nothing changed, or not in a git repo
+📋 2      report exists, 2 open follow-ups
+📋✅      report exists, no follow-ups
+📋 ✕      no report, and this session changed code
+📋 -      no report and nothing changed, or not in a git repo
 ```
 
 Both files are only counted, never printed. A symlinked or oversized file hides its badge.
