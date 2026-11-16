@@ -3,7 +3,7 @@
 A custom [Claude Code](https://claude.com/claude-code) status line: model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, an optional caveman-level badge, and the project name last.
 
 ```
-Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84 📁 $0.55 │ h 50% w 70% │ 🧠 3 │ 📋 2 │ 🦴 full │ 📁 important
+Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84 📁 $0.55 │ h 50% w 70% │ 🧠 3 📋 2 🦴 full │ 📁 important
 ```
 
 ## Install

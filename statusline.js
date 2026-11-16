@@ -504,16 +504,17 @@ process.stdin.on('end', () => {
   );
   const badge = cavemanBadge();
 
-  const parts = [];
-  if (model) parts.push(paint(c.cyan, model));
-  if (barPct != null) parts.push(makeBar(barPct));
   const todayCost = readTodayCost(configDir(), data.workspace && data.workspace.project_dir, new Date());
-  if (todayCost) parts.push(costPart(todayCost.total, todayCost.project));
-  parts.push(limits);
-  if (reflect) parts.push(reflect);
-  if (report) parts.push(report);
-  if (badge) parts.push(paint(c.orange, badge));
-  if (projectName) parts.push(PROJECT_ICON + ' ' + projectName);
+  const groups = [
+    [model && paint(c.cyan, model), barPct != null && makeBar(barPct)],
+    [todayCost && costPart(todayCost.total, todayCost.project)],
+    [limits],
+    [reflect, report, badge && paint(c.orange, badge)],
+    [projectName && PROJECT_ICON + ' ' + projectName],
+  ];
+  const parts = groups
+    .map((group) => group.filter(Boolean).join(' '))
+    .filter(Boolean);
 
   const sep = paint(c.gray, SEPARATOR);
   process.stdout.write(parts.join(sep));
