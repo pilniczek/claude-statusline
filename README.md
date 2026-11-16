@@ -1,9 +1,9 @@
 # claude-statusline
 
-A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", 5-hour and weekly plan usage, claude-reflect and work report badges, and an optional caveman-level badge.
+A custom [Claude Code](https://claude.com/claude-code) status line: project, model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, and an optional caveman-level badge.
 
 ```
-📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ h50% w70% │ 🧠 3 │ 📋 2 │ 🦴 full
+📁 important │ Opus 4.7 (1M) │ ▰▰▱▱▱▱▱▱▱▱ 15% │ $6.84 📁 $0.55 │ h50% w70% │ 🧠 3 │ 📋 2 │ 🦴 full
 ```
 
 ## Install
@@ -26,6 +26,18 @@ Restart Claude Code (or start a new session).
 `h50% w70%` shows how much of the 5-hour (`h`) and weekly (`w`) plan limits you have used. Values round up, so any fraction past a whole number shows the next one. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
 
 Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. A window Claude Code does not report - no subscription, before the first response, or right after a window expires - shows a dash, e.g. `h-% w71%`. Reset times and the gateway `spend_limit` are not shown.
+
+## Cost
+
+`$6.84 📁 $0.55` is what you have spent today: first across all projects, then for the current project. It matches the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension.
+
+- Source: Claude Code's own transcripts in `~/.claude/projects` (or `$CLAUDE_CONFIG_DIR/projects`). Only files changed since local midnight are read, and only their records from today count.
+- Each response counts once, deduped by message and request id, like the extension.
+- Price: tokens times the model's rate, from the Claude-only `CLAUDE_RATES` table in `statusline.js`. Unknown Claude models fall back to their family's rate. Other providers count as $0. Update the table when Anthropic changes prices.
+- Project: sessions whose working directory is the project dir or inside it, so worktrees under the repo count. Unlike the extension, `/a/foo` does not also catch `/a/foobar`.
+- It is an estimate at API prices, not a bill. On a subscription it shows what the usage would cost at API rates.
+
+No `project_dir` in the payload shows only the total. A failure hides the part.
 
 ## Reflect and work report badges
 
@@ -59,7 +71,7 @@ Nothing to configure, and nothing to install: without the plugin the file never 
 
 ## Configure
 
-Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PROJECT_ICON`, `SEPARATOR`, `REFLECT_ICON`, `REPORT_ICON`, `REPORT_DONE_ICON`, `REPORT_MISSING_ICON`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
+Edit the constants at the top of `statusline.js` — `SMART_ZONE`, `BAR_WIDTH`, `BAR_YELLOW_ABOVE`, `BAR_RED_ABOVE`, `RATE_LIMIT_YELLOW_ABOVE`, `RATE_LIMIT_RED_ABOVE`, `PROJECT_ICON`, `SEPARATOR`, `COST_PROJECT_ICON`, `REFLECT_ICON`, `REPORT_ICON`, `REPORT_DONE_ICON`, `REPORT_MISSING_ICON`, `CAVEMAN_ICON`, `CAVEMAN_LEVELS`. Design rationale (why the bar is scaled to a fixed zone, why colors are positional) lives in [CLAUDE.md](./CLAUDE.md).
 
 ## Preview locally
 
