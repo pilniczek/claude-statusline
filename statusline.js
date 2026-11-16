@@ -22,7 +22,7 @@ const REFLECT_ICON = '🧠';
 const REFLECT_QUEUE_MAX_BYTES = 1_048_576;
 const REPORT_ICON = '📋';
 const REPORT_DONE_ICON = '✅';
-const REPORT_MISSING_ICON = '❌';
+const REPORT_MISSING_ICON = '✖';
 const REPORT_MAX_BYTES = 262_144;
 const COST_PROJECT_ICON = '📁';
 const COST_TRANSCRIPT_MAX_BYTES = 268_435_456;
@@ -131,7 +131,7 @@ const reportBadge = (root, linesChanged) => {
   if (!root) return REPORT_ICON + ' ' + padCount('-');
   const count = readFollowUpCount(root);
   if (count === null) return null;
-  if (count === undefined) return REPORT_ICON + ' ' + (linesChanged > 0 ? REPORT_MISSING_ICON : padCount('-'));
+  if (count === undefined) return REPORT_ICON + ' ' + padCount(linesChanged > 0 ? REPORT_MISSING_ICON : '-');
   return REPORT_ICON + ' ' + (count > 0 ? padCount(count) : REPORT_DONE_ICON);
 };
 
@@ -421,10 +421,15 @@ const readTodayCost = (dir, projectDir, now) => {
   }
 };
 
-const costAmount = (usd) => '$' + usd.toFixed(2).padStart(COST_DIGITS);
+const slack = (text, digits) => ' '.repeat(Math.max(0, digits - text.length));
 
-const costPart = (total, project) => costAmount(total)
-  + (project === null ? '' : ' ' + COST_PROJECT_ICON + ' ' + costAmount(project));
+const costPart = (total, project) => {
+  const totalText = total.toFixed(2);
+  if (project === null) return '$' + totalText + slack(totalText, COST_DIGITS);
+  const projectText = project.toFixed(2);
+  return '$' + totalText + slack(totalText, COST_DIGITS) + slack(projectText, COST_DIGITS)
+    + ' ' + COST_PROJECT_ICON + ' $' + projectText;
+};
 
 const padPercent = (value) => String(value).padStart(PERCENT_DIGITS) + '%';
 
@@ -491,15 +496,20 @@ process.stdin.on('end', () => {
                                : n > RATE_LIMIT_YELLOW_ABOVE ? c.yellow
                                : c.green;
 
-  const rateLimitToken = (label, window) => {
-    if (!window || typeof window.used_percentage !== 'number') return label + padPercent('-');
-    const n = Math.max(0, Math.ceil(window.used_percentage));
-    return paint(rateLimitColor(n), label + padPercent(n));
-  };
+  const rateLimitValue = (window) => (window && typeof window.used_percentage === 'number'
+    ? String(Math.max(0, Math.ceil(window.used_percentage)))
+    : '-');
+
+  const rateLimitToken = (label, value) => (value === '-'
+    ? label + '-%'
+    : paint(rateLimitColor(Number(value)), label + value + '%'));
 
   const rateLimitPart = (rateLimits) => {
     const limits = rateLimits || {};
-    return rateLimitToken('h', limits.five_hour) + ' ' + rateLimitToken('w', limits.seven_day);
+    const hour = rateLimitValue(limits.five_hour);
+    const week = rateLimitValue(limits.seven_day);
+    return rateLimitToken('h', hour) + slack(hour, PERCENT_DIGITS) + slack(week, PERCENT_DIGITS) + ' '
+      + rateLimitToken('w', week);
   };
 
   const limits = rateLimitPart(data.rate_limits);

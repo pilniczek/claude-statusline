@@ -3,7 +3,7 @@
 A custom [Claude Code](https://claude.com/claude-code) status line: model, a 10-cell context-usage bar scaled to a 200k-token "smart zone", today's cost, 5-hour and weekly plan usage, claude-reflect and work report badges, an optional caveman-level badge, and the project name last.
 
 ```
-Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $  6.84 📁 $  0.55 │ h 50% w 70% │ 🧠  3 📋  2 🦴 full │ 📁 important
+Opus 4.7 (1M) ▰▰▱▱▱▱▱▱▱▱  15% │ $6.84     📁 $0.55 │ h50%   w70% │ 🧠  3 📋  2 🦴 full │ 📁 important
 ```
 
 ## Install
@@ -23,13 +23,13 @@ Restart Claude Code (or start a new session).
 
 ## Plan usage
 
-`h 50% w 70%` shows how much of the 5-hour (`h`) and weekly (`w`) plan limits you have used. Values round up, so any fraction past a whole number shows the next one. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
+`h50%   w70%` shows how much of the 5-hour (`h`) and weekly (`w`) plan limits you have used. Values round up, so any fraction past a whole number shows the next one. Each value is colored on its own: green up to 50%, yellow up to 90%, red above.
 
-Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. A window Claude Code does not report - no subscription, before the first response, or right after a window expires - shows a dash, e.g. `h  -% w 71%`. Reset times and the gateway `spend_limit` are not shown.
+Claude Code sends these only for claude.ai subscriptions, and only after the first response of a session. A window Claude Code does not report - no subscription, before the first response, or right after a window expires - shows a dash, e.g. `h-%    w71%`. Reset times and the gateway `spend_limit` are not shown.
 
 ## Cost
 
-`$  6.84 📁 $  0.55` is what you have spent today: first across all projects, then for the current project. Amounts are padded to a fixed width (`COST_DIGITS`) up to $999.99. It follows the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension. Figures can differ slightly, see below.
+`$6.84     📁 $0.55` is what you have spent today: first across all projects, then for the current project. The part keeps a fixed width up to $999.99 (`COST_DIGITS`): the spare space goes before `📁`. It follows the `$6.84 📁 $0.55` readout of the [Claude Code Usage](https://github.com/ClaudeCodeUsage/ClaudeCodeUsage) VS Code extension, without the extension. Figures can differ slightly, see below.
 
 - Source: Claude Code's own transcripts in `~/.claude/projects` (or `$CLAUDE_CONFIG_DIR/projects`). Only files changed since local midnight are read, and only their records from today count.
 - Each response counts once, deduped by message and request id, like the extension.
@@ -66,7 +66,7 @@ Known limits:
 ```
 📋  2     report exists, 2 open follow-ups
 📋 ✅     report exists, no follow-ups
-📋 ❌     no report, and this session changed code
+📋  ✖     no report, and this session changed code
 📋  -     no report and nothing changed, or not in a git repo
 ```
 
